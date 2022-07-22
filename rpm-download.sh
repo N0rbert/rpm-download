@@ -3,8 +3,8 @@ usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..
 Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
-    -d  distro name (alt, fedora, mageia)
-    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron)
+    -d  distro name (alt, fedora, mageia, opensuse)
+    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, leap and tumbleweed)
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)"
@@ -36,10 +36,11 @@ get_source_command="true"
 alt_releases="p8|p9|p10|sisyphus";
 fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|rawhide";
 mageia_releases="7|8|cauldron";
+opensuse_releases="leap|tumbleweed"
 
 # main code
-if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ]  ; then
-    echo "Error: only ALTLinux and Fedora are supported!";
+if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "opensuse" ] ; then
+    echo "Error: only ALTLinux, Fedora, Mageia and OpenSuSe are supported!";
     exit 1;
 else
     if [ "$distro" == "alt" ]; then
@@ -63,6 +64,13 @@ else
             exit 1;
        fi
     fi
+    if [ "$distro" == "opensuse" ]; then
+       if ! echo "$release" | grep -wEq "$opensuse_releases"
+       then
+            echo "Error: OpenSuSe $release is not supported!";
+            exit 1;
+       fi
+    fi
 fi
 
 # prepare storage folder
@@ -73,6 +81,13 @@ cd storage || { echo "Error: can't cd to storage directory!"; exit 3; }
 # prepare Dockerfile
 if [ "$distro" == "alt" ] || [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] ; then
     echo "FROM $distro:$release" > Dockerfile
+elif [ "$distro" == "opensuse" ]; then
+    echo "FROM $distro/$release:latest" > Dockerfile
+    if [ "$release" == "leap" ]; then
+        echo "RUN zypper install -y dnf rpm-repos-openSUSE-Leap" >> Dockerfile
+    elif [ "$release" == "tumbleweed" ]; then
+        echo "RUN zypper install -y dnf rpm-repos-openSUSE-Tumbleweed" >> Dockerfile
+    fi
 fi
 
 if [ "$distro" == "alt" ]; then
@@ -145,7 +160,7 @@ EOF
 
 fi # /distro=alt
 
-if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ]; then
+if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "opensuse" ]; then
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
 EOF
@@ -161,6 +176,7 @@ EOF
 cat << EOF > script.sh
 set -x
 
+mkdir -p /var/cache/rpm/archives
 cd /var/cache/rpm/archives
 $get_source_command || true && \
 dnf download ${packages[*]} --url | grep ^http:// | awk '{print \$1}' >> /var/cache/rpm/archives/urls.txt &&
@@ -174,4 +190,4 @@ EOF
     # run script inside container
     docker run --rm -v "${PWD}":/var/cache/rpm/archives -it "rd-$distro-$release" sh /var/cache/rpm/archives/script.sh
 
-fi # /distro=fedora,mageia
+fi # /distro=fedora,mageia,opensuse
