@@ -3,8 +3,8 @@ usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..
 Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
-    -d  distro name (alt, fedora)
-    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide)
+    -d  distro name (alt, fedora, mageia)
+    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron)
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)"
@@ -35,9 +35,10 @@ get_source_command="true"
 # distros and their versions
 alt_releases="p8|p9|p10|sisyphus";
 fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|rawhide";
+mageia_releases="7|8|cauldron";
 
 # main code
-if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] ; then
+if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ]  ; then
     echo "Error: only ALTLinux and Fedora are supported!";
     exit 1;
 else
@@ -55,6 +56,13 @@ else
             exit 1;
        fi
     fi
+    if [ "$distro" == "mageia" ]; then
+       if ! echo "$release" | grep -wEq "$mageia_releases"
+       then
+            echo "Error: Mageia $release is not supported!";
+            exit 1;
+       fi
+    fi
 fi
 
 # prepare storage folder
@@ -63,7 +71,7 @@ mkdir -p storage
 cd storage || { echo "Error: can't cd to storage directory!"; exit 3; }
 
 # prepare Dockerfile
-if [ "$distro" == "alt" ] || [ "$distro" == "fedora" ]; then
+if [ "$distro" == "alt" ] || [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] ; then
     echo "FROM $distro:$release" > Dockerfile
 fi
 
@@ -137,7 +145,7 @@ EOF
 
 fi # /distro=alt
 
-if [ "$distro" == "fedora" ]; then
+if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ]; then
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
 EOF
@@ -166,4 +174,4 @@ EOF
     # run script inside container
     docker run --rm -v "${PWD}":/var/cache/rpm/archives -it "rd-$distro-$release" sh /var/cache/rpm/archives/script.sh
 
-fi # /distro=fedora
+fi # /distro=fedora,mageia

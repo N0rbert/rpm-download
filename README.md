@@ -10,8 +10,8 @@ The `rpm-download.sh` takes at least three pairs of arguments, as shown in examp
 ./rpm-download.sh -d alt -r p8 -p mc
 ```
 
-* `-d` (distribution, mandatory) - `alt` for ALTLinux, `fedora` for Fedora;
-* `-r` (release, mandatory) - supported versions are the following: ALTLinux from p8 to Sisyphus, Fedora from 22 to Rawhide;
+* `-d` (distribution, mandatory) - `alt` for ALTLinux, `fedora` for Fedora, `mageia` for Mageia;
+* `-r` (release, mandatory) - supported versions are the following: ALTLinux from p8 to Sisyphus, Fedora from 22 to Rawhide, Mageia from 7 to Cauldron;
 * `-p` (with quotes for multiple packages, mandatory) - represent package(s) name(s) - in the above example it is single `mc` package. For two packages use `"mc htop"` (for example);
 * `-s` (get source code of package(s), optional);
 * `-a` (enable Autoimports for ALTLinux, optional).
