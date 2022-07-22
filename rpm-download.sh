@@ -1,5 +1,5 @@
 #!/bin/bash
-usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..\"] [-s]
+usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..\"] [-s] [-a] [-t]
 Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
@@ -7,11 +7,12 @@ where:
     -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, leap and tumbleweed)
     -p  packages
     -s  also download source-code package(s) (optional)
-    -a  enable Autoimports repository (optional for ALTLinux)"
+    -a  enable Autoimports repository (optional for ALTLinux)
+    -t  extra repository in two possible formats - <URL of .repo-file> or <URL> <LABEL> (Fedora and OpenSuSe, optional)"
 
 get_source=0
 use_autoimports=0
-while getopts ":hd:r:p:sa" opt; do
+while getopts ":hd:r:p:sat:" opt; do
   case "$opt" in
     h) echo "$usage"; exit;;
     d) distro=$OPTARG;;
@@ -19,6 +20,7 @@ while getopts ":hd:r:p:sa" opt; do
     p) packages=$OPTARG;;
     s) get_source=1;;
     a) use_autoimports=1;;
+    t) third_party_repo=$OPTARG;;
     \?) echo "Error: Unimplemented option chosen!"; echo "$usage" >&2; exit 1;;
   esac
 done
@@ -31,12 +33,13 @@ fi
 
 # commands which are dynamically generated from optional arguments
 get_source_command="true"
+third_party_repo_command="true"
 
 # distros and their versions
 alt_releases="p8|p9|p10|sisyphus";
 fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|rawhide";
 mageia_releases="7|8|cauldron";
-opensuse_releases="leap|tumbleweed"
+opensuse_releases="15.3|leap|tumbleweed"
 
 # main code
 if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "opensuse" ] ; then
@@ -82,11 +85,15 @@ cd storage || { echo "Error: can't cd to storage directory!"; exit 3; }
 if [ "$distro" == "alt" ] || [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] ; then
     echo "FROM $distro:$release" > Dockerfile
 elif [ "$distro" == "opensuse" ]; then
-    echo "FROM $distro/$release:latest" > Dockerfile
     if [ "$release" == "leap" ]; then
+        echo "FROM $distro/$release:latest" > Dockerfile
         echo "RUN zypper install -y dnf rpm-repos-openSUSE-Leap" >> Dockerfile
     elif [ "$release" == "tumbleweed" ]; then
+        echo "FROM $distro/$release:latest" > Dockerfile
         echo "RUN zypper install -y dnf rpm-repos-openSUSE-Tumbleweed" >> Dockerfile
+    else
+        echo "FROM $distro/leap:$release" > Dockerfile
+        echo "RUN zypper install -y dnf rpm-repos-openSUSE-Leap" >> Dockerfile
     fi
 fi
 
@@ -137,6 +144,11 @@ EOF
         get_source_command="apt-get source ${packages[*]} --print-uris | grep ^\'http:// | awk '{print \$1}' | sed \"s|'||g\" >> /var/cache/apt/archives/urls.txt && apt-get source ${packages[*]}"
     fi
 
+    # third party repository
+    if [ -n "$third_party_repo" ]; then
+        echo "Warning: third-party repository functionality for ALTLinux is not implemented (yet)!"
+    fi
+
 # prepare download script
 cat << EOF > script.sh
 set -x
@@ -164,6 +176,15 @@ if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "ope
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
 EOF
+    if [ -n "$third_party_repo" ]; then
+        if [ "$distro" == "opensuse" ]; then
+            third_party_repo_command="zypper ar -f '$third_party_repo' && zypper refresh; mv /etc/zypp/repos.d/*.repo /etc/yum.repos.d/; rm -vf /etc/yum.repos.d/repo-backports-debug-update.repo"
+        elif [ "$distro" == "fedora" ]; then
+            third_party_repo_command="dnf install 'dnf-command(config-manager)' && echo 'Please press <y> to accept GPG key!' && dnf config-manager --add-repo '$third_party_repo'"
+        elif [ "$distro" == "mageia" ]; then
+            echo "Warning: third-party repository functionality for Mageia is not implemented (yet)!"
+        fi
+    fi
 
     echo "RUN dnf install -y 'dnf-command(download)'" >> Dockerfile
 
@@ -178,6 +199,7 @@ set -x
 
 mkdir -p /var/cache/rpm/archives
 cd /var/cache/rpm/archives
+$third_party_repo_command || true && \
 $get_source_command || true && \
 dnf download ${packages[*]} --url | grep ^http:// | awk '{print \$1}' >> /var/cache/rpm/archives/urls.txt &&
 dnf download ${packages[*]}
