@@ -3,8 +3,8 @@ usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..
 Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
-    -d  distro name (alt)
-    -r  release name (p8/p9/p10/sisyphus)
+    -d  distro name (alt, fedora)
+    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide)
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)"
@@ -33,17 +33,25 @@ fi
 get_source_command="true"
 
 # distros and their versions
-supported_alt_releases="p8|p9|p10|sisyphus";
+alt_releases="p8|p9|p10|sisyphus";
+fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|rawhide";
 
 # main code
-if [ "$distro" != "alt" ]; then
-    echo "Error: only ALTLinux is supported!";
+if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] ; then
+    echo "Error: only ALTLinux and Fedora are supported!";
     exit 1;
 else
     if [ "$distro" == "alt" ]; then
-       if ! echo "$release" | grep -wEq "$supported_alt_releases"
+       if ! echo "$release" | grep -wEq "$alt_releases"
        then
             echo "Error: ALTLinux $release is not supported!";
+            exit 1;
+       fi
+    fi
+    if [ "$distro" == "fedora" ]; then
+       if ! echo "$release" | grep -wEq "$fedora_releases"
+       then
+            echo "Error: Fedora $release is not supported!";
             exit 1;
        fi
     fi
@@ -55,15 +63,14 @@ mkdir -p storage
 cd storage || { echo "Error: can't cd to storage directory!"; exit 3; }
 
 # prepare Dockerfile
-if [ "$distro" == "alt" ]; then
+if [ "$distro" == "alt" ] || [ "$distro" == "fedora" ]; then
     echo "FROM $distro:$release" > Dockerfile
 fi
 
+if [ "$distro" == "alt" ]; then
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'Acquire::http::Proxy "$http_proxy";' >> /etc/apt/apt.conf
 EOF
-
-if [ "$distro" == "alt" ]; then
     if [ "$release" == "p8" ] || [ "$release" == "p9" ] || [ "$release" == "p10" ]; then
         echo "RUN sed -i 's|^rpm \[$release\] http|#rpm \[$release\] http|g' /etc/apt/sources.list.d/*.list" >> Dockerfile
         echo "RUN sed -i 's|^#rpm \[$release\] http|rpm \[$release\] http|g' /etc/apt/sources.list.d/yandex.list" >> Dockerfile
@@ -101,12 +108,11 @@ if [ "$distro" == "alt" ]; then
             fi
         fi
     fi
-fi
 
-# source code
-if [ $get_source == 1 ]; then
-    get_source_command="apt-get source ${packages[*]} --print-uris | grep ^\'http:// | awk '{print \$1}' | sed \"s|'||g\" >> /var/cache/apt/archives/urls.txt && apt-get source ${packages[*]}"
-fi
+    # source code
+    if [ $get_source == 1 ]; then
+        get_source_command="apt-get source ${packages[*]} --print-uris | grep ^\'http:// | awk '{print \$1}' | sed \"s|'||g\" >> /var/cache/apt/archives/urls.txt && apt-get source ${packages[*]}"
+    fi
 
 # prepare download script
 cat << EOF > script.sh
@@ -123,8 +129,41 @@ apt-get install -y --reinstall --download-only ${packages[*]}
 chown -R "$(id --user):$(id --group)" /var/cache/apt/archives
 EOF
 
-# build container
-docker build . -t "rd-$distro-$release"
+    # build container
+    docker build . -t "rd-$distro-$release"
 
-# run script inside container
-docker run --rm -v "${PWD}":/var/cache/apt/archives -it "rd-$distro-$release" sh /var/cache/apt/archives/script.sh
+    # run script inside container
+    docker run --rm -v "${PWD}":/var/cache/apt/archives -it "rd-$distro-$release" sh /var/cache/apt/archives/script.sh
+
+fi # /distro=alt
+
+if [ "$distro" == "fedora" ]; then
+cat << EOF >> Dockerfile
+RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
+EOF
+
+    echo "RUN dnf install -y 'dnf-command(download)'" >> Dockerfile
+
+    # source code
+    if [ $get_source == 1 ]; then
+        get_source_command="dnf download --source ${packages[*]} --url | grep ^http:// | awk '{print \$1}' >> /var/cache/rpm/archives/urls.txt && dnf download --source ${packages[*]}"
+    fi
+
+# prepare download script
+cat << EOF > script.sh
+set -x
+
+cd /var/cache/rpm/archives
+$get_source_command || true && \
+dnf download ${packages[*]} --url | grep ^http:// | awk '{print \$1}' >> /var/cache/rpm/archives/urls.txt &&
+dnf download ${packages[*]}
+chown -R "$(id --user):$(id --group)" /var/cache/rpm/archives
+EOF
+
+    # build container
+    docker build . -t "rd-$distro-$release"
+
+    # run script inside container
+    docker run --rm -v "${PWD}":/var/cache/rpm/archives -it "rd-$distro-$release" sh /var/cache/rpm/archives/script.sh
+
+fi # /distro=fedora
