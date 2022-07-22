@@ -6,16 +6,19 @@ where:
     -d  distro name (alt)
     -r  release name (p8/p9/p10/sisyphus)
     -p  packages
-    -s  also download source-code package(s) (optional)"
+    -s  also download source-code package(s) (optional)
+    -a  enable Autoimports repository (optional for ALTLinux)"
 
 get_source=0
-while getopts ":hd:r:p:s" opt; do
+use_autoimports=0
+while getopts ":hd:r:p:sa" opt; do
   case "$opt" in
     h) echo "$usage"; exit;;
     d) distro=$OPTARG;;
     r) release=$OPTARG;;
     p) packages=$OPTARG;;
     s) get_source=1;;
+    a) use_autoimports=1;;
     \?) echo "Error: Unimplemented option chosen!"; echo "$usage" >&2; exit 1;;
   esac
 done
@@ -65,17 +68,37 @@ if [ "$distro" == "alt" ]; then
         echo "RUN sed -i 's|^rpm \[$release\] http|#rpm \[$release\] http|g' /etc/apt/sources.list.d/*.list" >> Dockerfile
         echo "RUN sed -i 's|^#rpm \[$release\] http|rpm \[$release\] http|g' /etc/apt/sources.list.d/yandex.list" >> Dockerfile
 
+        if [ $use_autoimports == 1 ]; then
+            echo "RUN echo 'rpm http://mirror.yandex.ru/altlinux/autoimports/$release x86_64 autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+            echo "RUN echo 'rpm http://mirror.yandex.ru/altlinux/autoimports/$release noarch autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+        fi
+
         if [ $get_source == 1 ]; then
             echo "RUN echo 'rpm-src [$release] http://mirror.yandex.ru/altlinux $release/branch/x86_64 classic' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
             echo "RUN echo 'rpm-src [$release] http://mirror.yandex.ru/altlinux $release/branch/noarch classic' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+
+            if [ $use_autoimports == 1 ]; then
+                echo "RUN echo 'rpm-src http://mirror.yandex.ru/altlinux/autoimports/$release x86_64 autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+                echo "RUN echo 'rpm-src http://mirror.yandex.ru/altlinux/autoimports/$release noarch autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+            fi
         fi
     else
         echo "RUN sed -i 's|^rpm \[alt\] http|#rpm \[alt\] http|g' /etc/apt/sources.list.d/*.list" >> Dockerfile
         echo "RUN sed -i 's|^#rpm \[alt\] http|rpm \[alt\] http|g' /etc/apt/sources.list.d/yandex.list" >> Dockerfile
 
+        if [ $use_autoimports == 1 ]; then
+            echo "RUN echo 'rpm http://mirror.yandex.ru/altlinux/autoimports/ Sisyphus/x86_64 autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+            echo "RUN echo 'rpm http://mirror.yandex.ru/altlinux/autoimports/ Sisyphus/noarch autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+        fi
+
         if [ $get_source == 1 ]; then
             echo "RUN echo 'rpm-src [alt] http://mirror.yandex.ru/altlinux/ Sisyphus/x86_64 classic' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
             echo "RUN echo 'rpm-src [alt] http://mirror.yandex.ru/altlinux/ Sisyphus/noarch classic' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+
+            if [ $use_autoimports == 1 ]; then
+                echo "RUN echo 'rpm-src http://mirror.yandex.ru/altlinux/autoimports/ Sisyphus/x86_64 autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+                echo "RUN echo 'rpm-src http://mirror.yandex.ru/altlinux/autoimports/ Sisyphus/noarch autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+            fi
         fi
     fi
 fi
