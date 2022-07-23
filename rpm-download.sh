@@ -8,7 +8,7 @@ where:
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)
-    -t  extra repository in two possible formats - <URL of .repo-file> or <URL> <LABEL> (Fedora and OpenSuSe, optional)"
+    -t  extra repository in two possible formats - <URL of .repo-file> or \"<URL> <LABEL>\" (Fedora, OpenSuSe, Mageia, optional)"
 
 get_source=0
 use_autoimports=0
@@ -177,13 +177,7 @@ cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
 EOF
     if [ -n "$third_party_repo" ]; then
-        if [ "$distro" == "opensuse" ]; then
-            third_party_repo_command="zypper ar -f '$third_party_repo' && zypper refresh; mv /etc/zypp/repos.d/*.repo /etc/yum.repos.d/; rm -vf /etc/yum.repos.d/repo-backports-debug-update.repo"
-        elif [ "$distro" == "fedora" ]; then
-            third_party_repo_command="dnf install 'dnf-command(config-manager)' && echo 'Please press <y> to accept GPG key!' && dnf config-manager --add-repo '$third_party_repo'"
-        elif [ "$distro" == "mageia" ]; then
-            echo "Warning: third-party repository functionality for Mageia is not implemented (yet)!"
-        fi
+        third_party_repo_command="dnf install -y 'dnf-command(config-manager)' && echo 'Please press <y> to accept GPG key!' && dnf config-manager --add-repo ${third_party_repo[*]}"
     fi
 
     echo "RUN dnf install -y 'dnf-command(download)'" >> Dockerfile
