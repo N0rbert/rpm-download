@@ -8,7 +8,7 @@ where:
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)
-    -t  extra repository in two possible formats - <URL of .repo-file> or \"<URL> <LABEL>\" (Fedora, OpenSuSe, Mageia, optional)"
+    -t  extra repository in three possible formats - <URL of .repo-file> or \"<URL> <LABEL>\" (Fedora, OpenSuSe, Mageia), full rpm sources.list line (ALTLinux) (optional)"
 
 get_source=0
 use_autoimports=0
@@ -29,6 +29,11 @@ done
 if [ ! "$distro" ] || [ ! "$release" ] || [ ! "$packages" ]; then
   echo "Error: arguments -d, -r and -p must be provided!"
   echo "$usage" >&2; exit 1
+fi
+
+# exclusions
+if [ "$distro" == "alt" ] && [ $get_source == 1 ] && [ -n "$third_party_repo" ]; then
+  echo "Warning: for ALTLinux getting source from third-party repository is not supported yet, you have been informed!"
 fi
 
 # commands which are dynamically generated from optional arguments
@@ -146,7 +151,7 @@ EOF
 
     # third party repository
     if [ -n "$third_party_repo" ]; then
-        echo "Warning: third-party repository functionality for ALTLinux is not implemented (yet)!"
+        third_party_repo_command="apt-get install -y apt-repo apt-https && apt-get clean && apt-repo add ${third_party_repo[*]} && apt-get update "
     fi
 
 # prepare download script
@@ -158,6 +163,7 @@ rm -rfv /var/cache/apt/archives/partial
 mkdir -p /var/cache/apt/archives/partial
 cd /var/cache/apt/archives
 apt-get update && \
+$third_party_repo_command || true && \
 $get_source_command || true && \
 apt-get install -y --reinstall --download-only ${packages[*]} --print-uris | grep ^\'http:// | awk '{print \$1}' | sed "s|'||g" >> /var/cache/apt/archives/urls.txt &&
 apt-get install -y --reinstall --download-only ${packages[*]}

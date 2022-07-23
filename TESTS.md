@@ -27,3 +27,16 @@ http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d fedora -r 35 -p 'drweb
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d mageia -r 8 -p 'drweb-workstations' -t "https://repo.drweb.com/drweb/linux/11.1/x86_64/ drweb" && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d opensuse -r leap -p 'drweb-workstations' -t "https://repo.drweb.com/drweb/linux/11.1/x86_64/ drweb" && tree storage
 ```
+
+Third-party repository as sources.list line for ALTLinux - get only binary:
+
+```
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d alt -r p9 -p anydesk -t "rpm http://altrepo.ru/local-p9 x86_64 local-p9" && tree storage
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d alt -r p10 -p drweb-workstations -t "rpm https://repo.drweb.com/drweb/altlinux 11.1/x86_64 drweb" && tree storage
+```
+
+Third-party task as for ALTLinux - get only binary:
+
+```
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d alt -r p8 -p 'pciids' -t "task 303713" && tree storage
+```
