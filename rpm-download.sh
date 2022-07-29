@@ -3,8 +3,8 @@ usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..
 Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
-    -d  distro name (alt, fedora, mageia, opensuse)
-    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, leap and tumbleweed)
+    -d  distro name (alt, fedora, mageia, opensuse, rosa)
+    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, leap and tumbleweed, only 2021.1)
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)
@@ -45,16 +45,18 @@ alt_releases="p8|p9|p10|sisyphus";
 fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|rawhide";
 mageia_releases="7|8|cauldron";
 opensuse_releases="15.3|leap|tumbleweed"
+rosa_releases="2021.1"
 
 # main code
-if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "opensuse" ] ; then
-    echo "Error: only ALTLinux, Fedora, Mageia and OpenSuSe are supported!";
+if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "opensuse" ] && [ "$distro" != "rosa" ] ; then
+    echo "Error: only ALTLinux, Fedora, Mageia, OpenSuSe and Rosa are supported!";
     exit 1;
 else
     if [ "$distro" == "alt" ]; then
        if ! echo "$release" | grep -wEq "$alt_releases"
        then
             echo "Error: ALTLinux $release is not supported!";
+            echo "Supported ALTLinux releases are $(echo $alt_releases | sed 's/|/, |g').";
             exit 1;
        fi
     fi
@@ -62,6 +64,7 @@ else
        if ! echo "$release" | grep -wEq "$fedora_releases"
        then
             echo "Error: Fedora $release is not supported!";
+            echo "Supported Fedora releases are $(echo $fedora_releases | sed 's/|/, |g').";
             exit 1;
        fi
     fi
@@ -69,6 +72,7 @@ else
        if ! echo "$release" | grep -wEq "$mageia_releases"
        then
             echo "Error: Mageia $release is not supported!";
+            echo "Supported Mageia releases are $(echo $mageia_releases | sed 's/|/, |g').";
             exit 1;
        fi
     fi
@@ -76,6 +80,15 @@ else
        if ! echo "$release" | grep -wEq "$opensuse_releases"
        then
             echo "Error: OpenSuSe $release is not supported!";
+            echo "Supported OpenSuSe releases are $(echo $opensuse_releases | sed 's/|/, |g').";
+            exit 1;
+       fi
+    fi
+    if [ "$distro" == "rosa" ]; then
+       if ! echo "$release" | grep -wEq "$rosa_releases"
+       then
+            echo "Error: Rosa $release is not supported!";
+            echo "Supported Rosa releases are $(echo $rosa_releases | sed 's/|/, |g')";
             exit 1;
        fi
     fi
@@ -100,6 +113,8 @@ elif [ "$distro" == "opensuse" ]; then
         echo "FROM $distro/leap:$release" > Dockerfile
         echo "RUN zypper install -y dnf rpm-repos-openSUSE-Leap" >> Dockerfile
     fi
+elif [ "$distro" == "rosa" ]; then
+    echo "FROM rosalab/rosa$release" > Dockerfile
 fi
 
 if [ "$distro" == "alt" ]; then
@@ -178,7 +193,7 @@ EOF
 
 fi # /distro=alt
 
-if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "opensuse" ]; then
+if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "opensuse" ] || [ "$distro" == "rosa" ]; then
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
 EOF

@@ -4,6 +4,7 @@ Official repository - get binary and source package:
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d fedora -r 35 -p 'mate-panel' -s && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d mageia -r 8 -p 'mate-panel' -s && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d opensuse -r leap -p 'mate-panel' -s && tree storage
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d rosa -r 2021.1 -p 'meld' -s && tree storage
 ```
 
 Third-party repository as .repo-URL - get only binary:
