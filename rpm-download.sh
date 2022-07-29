@@ -56,7 +56,7 @@ else
        if ! echo "$release" | grep -wEq "$alt_releases"
        then
             echo "Error: ALTLinux $release is not supported!";
-            echo "Supported ALTLinux releases are $(echo $alt_releases | sed 's/|/, |g').";
+            echo "Supported ALTLinux releases are $(echo $alt_releases | sed 's/|/, /g').";
             exit 1;
        fi
     fi
@@ -64,7 +64,7 @@ else
        if ! echo "$release" | grep -wEq "$fedora_releases"
        then
             echo "Error: Fedora $release is not supported!";
-            echo "Supported Fedora releases are $(echo $fedora_releases | sed 's/|/, |g').";
+            echo "Supported Fedora releases are $(echo $fedora_releases | sed 's/|/, /g').";
             exit 1;
        fi
     fi
@@ -72,7 +72,7 @@ else
        if ! echo "$release" | grep -wEq "$mageia_releases"
        then
             echo "Error: Mageia $release is not supported!";
-            echo "Supported Mageia releases are $(echo $mageia_releases | sed 's/|/, |g').";
+            echo "Supported Mageia releases are $(echo $mageia_releases | sed 's/|/, /g').";
             exit 1;
        fi
     fi
@@ -80,7 +80,7 @@ else
        if ! echo "$release" | grep -wEq "$opensuse_releases"
        then
             echo "Error: OpenSuSe $release is not supported!";
-            echo "Supported OpenSuSe releases are $(echo $opensuse_releases | sed 's/|/, |g').";
+            echo "Supported OpenSuSe releases are $(echo $opensuse_releases | sed 's/|/, /g').";
             exit 1;
        fi
     fi
@@ -88,7 +88,7 @@ else
        if ! echo "$release" | grep -wEq "$rosa_releases"
        then
             echo "Error: Rosa $release is not supported!";
-            echo "Supported Rosa releases are $(echo $rosa_releases | sed 's/|/, |g')";
+            echo "Supported Rosa releases are $(echo $rosa_releases | sed 's/|/, /g').";
             exit 1;
        fi
     fi
