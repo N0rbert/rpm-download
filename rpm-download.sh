@@ -113,6 +113,7 @@ if [ "$distro" == "alt" ] || [ "$distro" == "fedora" ] || [ "$distro" == "mageia
     echo "FROM $distro:$release" > Dockerfile
 elif [ "$distro" == "openmandriva" ]; then
     echo "FROM openmandriva/$release" > Dockerfile
+    echo "RUN dnf install -y awk" >> Dockerfile
 elif [ "$distro" == "opensuse" ]; then
     if [ "$release" == "leap" ]; then
         echo "FROM $distro/$release:latest" > Dockerfile
