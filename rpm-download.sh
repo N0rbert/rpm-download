@@ -120,7 +120,7 @@ elif [ "$distro" == "opensuse" ]; then
         echo "RUN zypper install -y dnf rpm-repos-openSUSE-Leap" >> Dockerfile
     elif [ "$release" == "tumbleweed" ]; then
         echo "FROM $distro/$release:latest" > Dockerfile
-        echo "RUN zypper install -y dnf rpm-repos-openSUSE-Tumbleweed" >> Dockerfile
+        echo "RUN zypper install -y dnf rpm-repos-openSUSE-Tumbleweed gawk" >> Dockerfile
     else
         echo "FROM $distro/leap:$release" > Dockerfile
         echo "RUN zypper install -y dnf rpm-repos-openSUSE-Leap" >> Dockerfile
