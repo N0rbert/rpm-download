@@ -8,6 +8,7 @@ http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d openmandriva -r 4.2 -p
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d opensuse -r leap -p 'mate-panel' -s && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d rosa -r 2021.1 -p 'meld' -s && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d rockylinux -r 9.2 -p 'bash' -s && tree storage
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d almalinux -r 9.2 -p 'bash' -s && tree storage
 ```
 
 Third-party repository as .repo-URL - get only binary:
@@ -15,6 +16,8 @@ Third-party repository as .repo-URL - get only binary:
 ```
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d fedora -r 35 -p 'VirtualBox-6.1' -t "https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo" && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d opensuse -r 15.3 -p 'VirtualBox-6.1' -t "https://download.virtualbox.org/virtualbox/rpm/opensuse/virtualbox.repo" && tree storage
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d rockylinux -r 9.2 -p 'VirtualBox-6.1' -t "https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo" && tree storage
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d almalinux -r 9.2 -p 'VirtualBox-6.1' -t "https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo" && tree storage
 ```
 
 Third-party repository as .repo-URL - get binary and source:
