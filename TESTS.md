@@ -9,6 +9,7 @@ http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d opensuse -r leap -p 'm
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d rosa -r 2021.1 -p 'meld' -s && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d rockylinux -r 9.2 -p 'bash' -s && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d almalinux -r 9.2 -p 'bash' -s && tree storage
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d redos -r latest -p 'bash' -s && tree storage # src.rpm are not available
 ```
 
 Third-party repository as .repo-URL - get only binary:

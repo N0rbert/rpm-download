@@ -3,12 +3,12 @@ usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..
 Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
-    -d  distro name (alt, fedora, mageia, openmandriva, opensuse, rosa, rockylinux, almalinux)
-    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, 4.2 and cooker, leap and tumbleweed, only 2021.1, from 8.4, from 8.4)
+    -d  distro name (alt, fedora, mageia, openmandriva, opensuse, rosa, rockylinux, almalinux, redos)
+    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, 4.2 and cooker, leap and tumbleweed, only 2021.1, from 8.4, from 8.4, only latest)
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)
-    -t  extra repository in three possible formats - <URL of .repo-file> or \"<URL> <LABEL>\" (Fedora, OpenSuSe, Mageia, Rocky Linux, AlmaLinux), full rpm sources.list line (ALTLinux) (optional)"
+    -t  extra repository in three possible formats - <URL of .repo-file> or \"<URL> <LABEL>\" (Fedora, OpenSuSe, Mageia, Rocky Linux, AlmaLinux, RedOS), full rpm sources.list line (ALTLinux) (optional)"
 
 get_source=0
 use_autoimports=0
@@ -36,6 +36,10 @@ if [ "$distro" == "alt" ] && [ $get_source == 1 ] && [ -n "$third_party_repo" ];
   echo "Warning: for ALTLinux getting source from third-party repository is not supported yet, you have been informed!"
 fi
 
+if [ "$distro" == "redos" ] && [ $get_source == 1 ]; then
+  echo "Warning: for RedOS getting source from repository is not possible, you have been informed!"
+fi
+
 # commands which are dynamically generated from optional arguments
 get_source_command="true"
 third_party_repo_command="true"
@@ -49,10 +53,11 @@ opensuse_releases="15.3|15.4|15.5|leap|tumbleweed"
 rosa_releases="2021.1"
 rockylinux_releases="8.4|8.5|8.6|8.7|8.8|9.0|9.1|9.2"
 almalinux_releases="8.4|8.5|8.6|8.7|8.8|9.0|9.1|9.2"
+redos_releases="latest"
 
 # main code
-if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "openmandriva" ] && [ "$distro" != "opensuse" ] && [ "$distro" != "rosa" ] && [ "$distro" != "rockylinux" ] && [ "$distro" != "almalinux" ] ; then
-    echo "Error: only ALTLinux, Fedora, Mageia, OpenMandriva, OpenSuSe, Rosa, Rocky Linux and AlmaLinux are supported!";
+if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "openmandriva" ] && [ "$distro" != "opensuse" ] && [ "$distro" != "rosa" ] && [ "$distro" != "rockylinux" ] && [ "$distro" != "almalinux" ] && [ "$distro" != "redos" ] ; then
+    echo "Error: only ALTLinux, Fedora, Mageia, OpenMandriva, OpenSuSe, Rosa, Rocky Linux, AlmaLinux and RedOS are supported!";
     exit 1;
 else
     if [ "$distro" == "alt" ]; then
@@ -119,6 +124,14 @@ else
             exit 1;
        fi
     fi
+    if [ "$distro" == "redos" ]; then
+       if ! echo "$release" | grep -wEq "$redos_releases"
+       then
+            echo "Error: RedOS $release is not supported!";
+            echo "Supported RedOS releases are ${redos_releases//|/, }.";
+            exit 1;
+       fi
+    fi
 fi
 
 # prepare storage folder
@@ -149,6 +162,8 @@ elif [ "$distro" == "rockylinux" ]; then
     echo "FROM rockylinux/rockylinux:$release" > Dockerfile
 elif [ "$distro" == "almalinux" ]; then
     echo "FROM almalinux:$release" > Dockerfile
+elif [ "$distro" == "redos" ]; then
+    echo "FROM registry.red-soft.ru/ubi7:$release" > Dockerfile
 fi
 
 if [ "$distro" == "alt" ]; then
@@ -227,7 +242,7 @@ EOF
 
 fi # /distro=alt
 
-if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "openmandriva" ] || [ "$distro" == "opensuse" ] || [ "$distro" == "rosa" ] || [ "$distro" == "rockylinux" ] || [ "$distro" == "almalinux" ] ; then
+if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "openmandriva" ] || [ "$distro" == "opensuse" ] || [ "$distro" == "rosa" ] || [ "$distro" == "rockylinux" ] || [ "$distro" == "almalinux" ] || [ "$distro" == "redos" ]; then
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
 EOF
