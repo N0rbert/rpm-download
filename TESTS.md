@@ -48,3 +48,15 @@ Third-party task as for ALTLinux - get only binary:
 ```
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d alt -r p8 -p 'pciids' -t "task 303713" && tree storage
 ```
+
+Third-party repository named Terra for Fedora - get only binary:
+
+```
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d fedora -r 39 -p terra-release -t https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo -s && tree storage
+```
+
+Third-party repository named Terra for Fedora - get only source:
+
+```
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d fedora -r 39 -p terra-release -t "https://repos.fyralabs.com/terra39-source" -s && tree storage
+```
