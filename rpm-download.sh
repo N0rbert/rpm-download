@@ -46,13 +46,13 @@ third_party_repo_command="true"
 
 # distros and their versions
 alt_releases="p8|p9|p10|sisyphus";
-fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|rawhide";
+fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|rawhide";
 mageia_releases="7|8|cauldron";
 openmandriva_releases="4.2|cooker"
 opensuse_releases="15.3|15.4|15.5|leap|tumbleweed"
-rosa_releases="2021.1"
-rockylinux_releases="8.4|8.5|8.6|8.7|8.8|9.0|9.1|9.2"
-almalinux_releases="8.4|8.5|8.6|8.7|8.8|9.0|9.1|9.2"
+rosa_releases="2021.1|2023.1"
+rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3"
+almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3"
 redos_releases="latest"
 
 # main code
