@@ -3,8 +3,8 @@ usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..
 Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
-    -d  distro name (alt, fedora, mageia, openmandriva, opensuse, rosa, rockylinux, almalinux, redos)
-    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, 4.2 and cooker, leap and tumbleweed, only 2021.1, from 8.4, from 8.4, only latest)
+    -d  distro name (alt, fedora, mageia, openmandriva, opensuse, rosa, rockylinux, almalinux, redos, msvsphere)
+    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, 4.2 and cooker, leap and tumbleweed, only 2021.1, from 8.4, from 8.4, only latest, from 8.0)
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)
@@ -54,10 +54,11 @@ rosa_releases="2021.1|2023.1"
 rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3"
 almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3"
 redos_releases="latest"
+msvsphere_releases="8|8.9|9|9.1|9.2|9.3|latest"
 
 # main code
-if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "openmandriva" ] && [ "$distro" != "opensuse" ] && [ "$distro" != "rosa" ] && [ "$distro" != "rockylinux" ] && [ "$distro" != "almalinux" ] && [ "$distro" != "redos" ] ; then
-    echo "Error: only ALTLinux, Fedora, Mageia, OpenMandriva, OpenSuSe, Rosa, Rocky Linux, AlmaLinux and RedOS are supported!";
+if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "openmandriva" ] && [ "$distro" != "opensuse" ] && [ "$distro" != "rosa" ] && [ "$distro" != "rockylinux" ] && [ "$distro" != "almalinux" ] && [ "$distro" != "redos" ] && [ "$distro" != "msvsphere" ] ; then
+    echo "Error: only ALTLinux, Fedora, Mageia, OpenMandriva, OpenSuSe, Rosa, Rocky Linux, AlmaLinux, RedOS and MSVSphere are supported!";
     exit 1;
 else
     if [ "$distro" == "alt" ]; then
@@ -132,6 +133,14 @@ else
             exit 1;
        fi
     fi
+    if [ "$distro" == "msvsphere" ]; then
+       if ! echo "$release" | grep -wEq "$msvsphere_releases"
+       then
+            echo "Error: MSVSphere $release is not supported!";
+            echo "Supported MSVSphere releases are ${msvsphere_releases//|/, }.";
+            exit 1;
+       fi
+    fi
 fi
 
 # prepare storage folder
@@ -164,6 +173,8 @@ elif [ "$distro" == "almalinux" ]; then
     echo "FROM almalinux:$release" > Dockerfile
 elif [ "$distro" == "redos" ]; then
     echo "FROM registry.red-soft.ru/ubi7:$release" > Dockerfile
+elif [ "$distro" == "msvsphere" ]; then
+    echo "FROM inferit/$distro:$release" > Dockerfile
 fi
 
 if [ "$distro" == "alt" ]; then
@@ -242,7 +253,7 @@ EOF
 
 fi # /distro=alt
 
-if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "openmandriva" ] || [ "$distro" == "opensuse" ] || [ "$distro" == "rosa" ] || [ "$distro" == "rockylinux" ] || [ "$distro" == "almalinux" ] || [ "$distro" == "redos" ]; then
+if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "openmandriva" ] || [ "$distro" == "opensuse" ] || [ "$distro" == "rosa" ] || [ "$distro" == "rockylinux" ] || [ "$distro" == "almalinux" ] || [ "$distro" == "redos" ] || [ "$distro" == "msvsphere" ]; then
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
 EOF
@@ -276,4 +287,4 @@ EOF
     # run script inside container
     docker run --rm -v "${PWD}":/var/cache/rpm/archives -it "rd-$distro-$release" sh /var/cache/rpm/archives/script.sh
 
-fi # /distro=fedora,mageia,opensuse
+fi # /distro=fedora,mageia,opensuse,rosa,rockylinux,almalinux,redos,msvsphere

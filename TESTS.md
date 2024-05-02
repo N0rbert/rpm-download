@@ -10,6 +10,7 @@ http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d rosa -r 2021.1 -p 'mel
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d rockylinux -r 9.2 -p 'bash' -s && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d almalinux -r 9.2 -p 'bash' -s && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d redos -r latest -p 'bash' -s && tree storage # src.rpm are not available
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d msvsphere -r latest -p bash -s && tree storage
 ```
 
 Third-party repository as .repo-URL - get only binary:
