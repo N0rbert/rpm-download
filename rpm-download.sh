@@ -51,8 +51,8 @@ mageia_releases="7|8|9|cauldron";
 openmandriva_releases="4.2|cooker"
 opensuse_releases="15.3|15.4|15.5|leap|tumbleweed"
 rosa_releases="2021.1|2023.1"
-rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3"
-almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3"
+rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3|9.4"
+almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3|9.4"
 redos_releases="latest"
 msvsphere_releases="8|8.9|9|9.1|9.2|9.3|latest"
 
