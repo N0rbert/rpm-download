@@ -45,14 +45,14 @@ get_source_command="true"
 third_party_repo_command="true"
 
 # distros and their versions
-alt_releases="p8|p9|p10|sisyphus";
+alt_releases="p8|p9|p10|p11|sisyphus";
 fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|rawhide";
 mageia_releases="7|8|9|cauldron";
 openmandriva_releases="4.2|cooker"
-opensuse_releases="15.3|15.4|15.5|leap|tumbleweed"
+opensuse_releases="15.3|15.4|15.5|15.6|leap|tumbleweed"
 rosa_releases="2021.1|2023.1"
-rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3|9.4"
-almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|9.0|9.1|9.2|9.3|9.4"
+rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4"
+almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4"
 redos_releases="latest"
 msvsphere_releases="8|8.9|9|9.1|9.2|9.3|latest"
 
@@ -181,7 +181,7 @@ if [ "$distro" == "alt" ]; then
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'Acquire::http::Proxy "$http_proxy";' >> /etc/apt/apt.conf
 EOF
-    if [ "$release" == "p8" ] || [ "$release" == "p9" ] || [ "$release" == "p10" ]; then
+    if [ "$release" == "p8" ] || [ "$release" == "p9" ] || [ "$release" == "p10" ] || [ "$release" == "p11" ]; then
         echo "RUN sed -i 's|^rpm \[$release\] http|#rpm \[$release\] http|g' /etc/apt/sources.list.d/*.list" >> Dockerfile
         echo "RUN sed -i 's|^#rpm \[$release\] http|rpm \[$release\] http|g' /etc/apt/sources.list.d/yandex.list" >> Dockerfile
 
