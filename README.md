@@ -11,7 +11,7 @@ The `rpm-download.sh` takes at least three pairs of arguments, as shown in examp
 ```
 
 * `-d` (distribution, mandatory) - `alt` for ALTLinux, `fedora` for Fedora, `mageia` for Mageia, `openmandriva` for OpenMandriva, `opensuse` for OpenSuSe, `rosa` for ROSA, `rockylinux` for Rocky Linux, `almalinux` for AlmaLinux, `redos` for RedOS;
-* `-r` (release, mandatory) - supported versions are the following: ALTLinux from `p8` to `sisyphus`, Fedora from `22` to `rawhide`, Mageia from `7` to `cauldron`, OpenMandriva - `4.2` and `cooker`, OpenSuSe from `leap` to `tumbleweed`, Rosa - only `2021.1`, Rocky Linux from `8.4`, AlmaLinux from `8.4`, RedOS - only `latest`, MSVSphere from 8 to latest;
+* `-r` (release, mandatory) - supported versions are the following: ALTLinux from `p8` to `sisyphus`, Fedora from `22` to `rawhide`, Mageia from `7` to `cauldron`, OpenMandriva - `4.2`, `cooker` and `rome`, OpenSuSe from `leap` to `tumbleweed`, Rosa - only `2021.1`, Rocky Linux from `8.4`, AlmaLinux from `8.4`, RedOS - only `latest`, MSVSphere from 8 to latest;
 * `-p` (with quotes for multiple packages, mandatory) - represent package(s) name(s) - in the above example it is single `mc` package. For two packages use `"mc htop"` (for example);
 * `-s` (get source code of package(s), optional);
 * `-a` (enable Autoimports for ALTLinux, optional);

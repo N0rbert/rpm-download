@@ -48,7 +48,7 @@ third_party_repo_command="true"
 alt_releases="p8|p9|p10|p11|sisyphus";
 fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|rawhide";
 mageia_releases="7|8|9|cauldron";
-openmandriva_releases="4.2|cooker"
+openmandriva_releases="4.2|cooker|rome"
 opensuse_releases="15.3|15.4|15.5|15.6|leap|tumbleweed"
 rosa_releases="2021.1|2023.1"
 rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4"
@@ -152,7 +152,24 @@ cd storage || { echo "Error: can't cd to storage directory!"; exit 3; }
 if [ "$distro" == "alt" ] || [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] ; then
     echo "FROM $distro:$release" > Dockerfile
 elif [ "$distro" == "openmandriva" ]; then
-    echo "FROM openmandriva/$release" > Dockerfile
+    if [ "$release" == "rome" ]; then
+        echo "FROM openmandriva/cooker" > Dockerfile
+        echo "RUN dnf install -y 'dnf-command(config-manager)'" >> Dockerfile
+        echo "RUN dnf config-manager --disable openmandriva-x86_64" >> Dockerfile
+        echo "RUN dnf config-manager --disable cooker-x86_64" >> Dockerfile
+        echo "RUN dnf config-manager --enable rolling-x86_64" >> Dockerfile
+        echo "RUN dnf config-manager --enable rolling-x86_64-non-free" >> Dockerfile
+        echo "RUN dnf config-manager --enable rolling-x86_64-restricted" >> Dockerfile
+        echo "RUN dnf config-manager --enable rolling-x86_64-unsupported" >> Dockerfile
+    elif [ "$release" == "cooker" ]; then
+        echo "FROM openmandriva/cooker" > Dockerfile
+        echo "RUN dnf install -y 'dnf-command(config-manager)'" >> Dockerfile
+        echo "RUN dnf config-manager --enable cooker-x86_64-non-free" >> Dockerfile
+        echo "RUN dnf config-manager --enable cooker-x86_64-restricted" >> Dockerfile
+        echo "RUN dnf config-manager --enable cooker-x86_64-unsupported" >> Dockerfile
+    else
+        echo "FROM openmandriva/$release" > Dockerfile
+    fi
     echo "RUN dnf install -y awk" >> Dockerfile
 elif [ "$distro" == "opensuse" ]; then
     if [ "$release" == "leap" ]; then
