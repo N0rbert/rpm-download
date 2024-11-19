@@ -3,12 +3,12 @@ usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..
 Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
-    -d  distro name (alt, fedora, mageia, openmandriva, opensuse, rosa, rockylinux, almalinux, redos, msvsphere)
+    -d  distro name (alt, fedora, mageia, openmandriva, opensuse, rosa, rockylinux, almalinux, oraclelinux, redos, msvsphere)
     -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, 4.2 and cooker, leap and tumbleweed, only 2021.1, from 8.4, from 8.4, only latest, from 8.0)
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)
-    -t  extra repository in three possible formats - <URL of .repo-file> or \"<URL> <LABEL>\" (Fedora, OpenSuSe, Mageia, Rocky Linux, AlmaLinux, RedOS), full rpm sources.list line (ALTLinux) (optional)"
+    -t  extra repository in three possible formats - <URL of .repo-file> or \"<URL> <LABEL>\" (Fedora, OpenSuSe, Mageia, Rocky Linux, AlmaLinux, Oracle Linux, RedOS), full rpm sources.list line (ALTLinux) (optional)"
 
 get_source=0
 use_autoimports=0
@@ -51,14 +51,17 @@ mageia_releases="7|8|9|cauldron";
 openmandriva_releases="4.2|cooker|rome"
 opensuse_releases="15.3|15.4|15.5|15.6|leap|tumbleweed"
 rosa_releases="2021.1|2023.1"
+
 rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5"
 almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5"
+oraclelinux_releases="^8$|8.0|8.1|8.2|8.3|8.4|8.5|8.6|8.7|8.8|8.9|8.10|^9$"
+
 redos_releases="latest"
 msvsphere_releases="8|8.9|9|9.1|9.2|9.3|latest"
 
 # main code
-if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "openmandriva" ] && [ "$distro" != "opensuse" ] && [ "$distro" != "rosa" ] && [ "$distro" != "rockylinux" ] && [ "$distro" != "almalinux" ] && [ "$distro" != "redos" ] && [ "$distro" != "msvsphere" ] ; then
-    echo "Error: only ALTLinux, Fedora, Mageia, OpenMandriva, OpenSuSe, Rosa, Rocky Linux, AlmaLinux, RedOS and MSVSphere are supported!";
+if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "openmandriva" ] && [ "$distro" != "opensuse" ] && [ "$distro" != "rosa" ] && [ "$distro" != "rockylinux" ] && [ "$distro" != "almalinux" ] && [ "$distro" != "oraclelinux" ] && [ "$distro" != "redos" ] && [ "$distro" != "msvsphere" ] ; then
+    echo "Error: only ALTLinux, Fedora, Mageia, OpenMandriva, OpenSuSe, Rosa, Rocky Linux, AlmaLinux, Oracle Linux, RedOS and MSVSphere are supported!";
     exit 1;
 else
     if [ "$distro" == "alt" ]; then
@@ -125,6 +128,14 @@ else
             exit 1;
        fi
     fi
+    if [ "$distro" == "oraclelinux" ]; then
+       if ! echo "$release" | grep -wEq "$oraclelinux_releases"
+       then
+            echo "Error: Oracle Linux $release is not supported!";
+            echo "Supported Oracle Linux releases are ${oraclelinux_releases//|/, }." | sed 's|[\^\$]||g';
+            exit 1;
+       fi
+    fi
     if [ "$distro" == "redos" ]; then
        if ! echo "$release" | grep -wEq "$redos_releases"
        then
@@ -188,6 +199,8 @@ elif [ "$distro" == "rockylinux" ]; then
     echo "FROM rockylinux/rockylinux:$release" > Dockerfile
 elif [ "$distro" == "almalinux" ]; then
     echo "FROM almalinux:$release" > Dockerfile
+elif [ "$distro" == "oraclelinux" ]; then
+    echo "FROM oraclelinux:$release" > Dockerfile
 elif [ "$distro" == "redos" ]; then
     echo "FROM registry.red-soft.ru/ubi7:$release" > Dockerfile
 elif [ "$distro" == "msvsphere" ]; then
@@ -270,7 +283,7 @@ EOF
 
 fi # /distro=alt
 
-if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "openmandriva" ] || [ "$distro" == "opensuse" ] || [ "$distro" == "rosa" ] || [ "$distro" == "rockylinux" ] || [ "$distro" == "almalinux" ] || [ "$distro" == "redos" ] || [ "$distro" == "msvsphere" ]; then
+if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "openmandriva" ] || [ "$distro" == "opensuse" ] || [ "$distro" == "rosa" ] || [ "$distro" == "rockylinux" ] || [ "$distro" == "almalinux" ] || [ "$distro" == "oraclelinux" ] || [ "$distro" == "redos" ] || [ "$distro" == "msvsphere" ]; then
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
 EOF
@@ -304,4 +317,4 @@ EOF
     # run script inside container
     docker run --rm -v "${PWD}":/var/cache/rpm/archives -it "rd-$distro-$release" sh /var/cache/rpm/archives/script.sh
 
-fi # /distro=fedora,mageia,opensuse,rosa,rockylinux,almalinux,redos,msvsphere
+fi # /distro=fedora,mageia,opensuse,rosa,rockylinux,almalinux,oraclelinux,redos,msvsphere
