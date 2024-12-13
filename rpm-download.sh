@@ -55,13 +55,14 @@ rosa_releases="2021.1|2023.1"
 rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5"
 almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5"
 oraclelinux_releases="^8$|8.0|8.1|8.2|8.3|8.4|8.5|8.6|8.7|8.8|8.9|8.10|^9$"
+centos_releases="stream9|stream10"
 
 redos_releases="latest"
 msvsphere_releases="8|8.9|9|9.1|9.2|9.3|latest"
 
 # main code
-if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "openmandriva" ] && [ "$distro" != "opensuse" ] && [ "$distro" != "rosa" ] && [ "$distro" != "rockylinux" ] && [ "$distro" != "almalinux" ] && [ "$distro" != "oraclelinux" ] && [ "$distro" != "redos" ] && [ "$distro" != "msvsphere" ] ; then
-    echo "Error: only ALTLinux, Fedora, Mageia, OpenMandriva, OpenSuSe, Rosa, Rocky Linux, AlmaLinux, Oracle Linux, RedOS and MSVSphere are supported!";
+if [ "$distro" != "alt" ] && [ "$distro" != "fedora" ] && [ "$distro" != "mageia" ] && [ "$distro" != "openmandriva" ] && [ "$distro" != "opensuse" ] && [ "$distro" != "rosa" ] && [ "$distro" != "rockylinux" ] && [ "$distro" != "almalinux" ] && [ "$distro" != "oraclelinux" ] && [ "$distro" != "redos" ] && [ "$distro" != "msvsphere" ] && [ "$distro" != "centos" ] ; then
+    echo "Error: only ALTLinux, Fedora, Mageia, OpenMandriva, OpenSuSe, Rosa, Rocky Linux, AlmaLinux, Oracle Linux, RedOS, MSVSphere and CentOS are supported!";
     exit 1;
 else
     if [ "$distro" == "alt" ]; then
@@ -152,6 +153,14 @@ else
             exit 1;
        fi
     fi
+    if [ "$distro" == "centos" ]; then
+       if ! echo "$release" | grep -wEq "$centos_releases"
+       then
+            echo "Error: CentOS $release is not supported!";
+            echo "Supported CentOS releases are ${centos_releases//|/, }.";
+            exit 1;
+       fi
+    fi
 fi
 
 # prepare storage folder
@@ -205,6 +214,8 @@ elif [ "$distro" == "redos" ]; then
     echo "FROM registry.red-soft.ru/ubi7:$release" > Dockerfile
 elif [ "$distro" == "msvsphere" ]; then
     echo "FROM inferit/$distro:$release" > Dockerfile
+elif [ "$distro" == "centos" ]; then
+    echo "FROM quay.io/$distro/$distro:$release" > Dockerfile
 fi
 
 if [ "$distro" == "alt" ]; then
@@ -283,19 +294,32 @@ EOF
 
 fi # /distro=alt
 
-if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "openmandriva" ] || [ "$distro" == "opensuse" ] || [ "$distro" == "rosa" ] || [ "$distro" == "rockylinux" ] || [ "$distro" == "almalinux" ] || [ "$distro" == "oraclelinux" ] || [ "$distro" == "redos" ] || [ "$distro" == "msvsphere" ]; then
+if [ "$distro" == "fedora" ] || [ "$distro" == "mageia" ] || [ "$distro" == "openmandriva" ] || [ "$distro" == "opensuse" ] || [ "$distro" == "rosa" ] || [ "$distro" == "rockylinux" ] || [ "$distro" == "almalinux" ] || [ "$distro" == "oraclelinux" ] || [ "$distro" == "redos" ] || [ "$distro" == "msvsphere" ] || [ "$distro" == "centos" ]; then
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'proxy=$http_proxy' >> /etc/dnf/dnf.conf
 EOF
     if [ -n "$third_party_repo" ]; then
+      if [ "$distro" == "centos" ]; then
+        if [ "$third_party_repo" == "epel" ]; then
+          crb_command="dnf install -y 'dnf-command(config-manager)' && dnf config-manager --set-enabled crb"
+          if [ "$release" == "stream9" ]; then
+            third_party_repo_command="$crb_command && dnf install -y https://dl.fedoraproject.org/pub/epel/epel{,-next}-release-latest-9.noarch.rpm"
+          elif [ "$release" == "stream10" ]; then
+            third_party_repo_command="$crb_command && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm"
+          fi
+        else
+          echo "Warning: on CentOS currently only EPEL third-party repository is supported!"
+        fi
+      else
         third_party_repo_command="dnf install -y 'dnf-command(config-manager)' && echo 'Please press <y> to accept GPG key!' && dnf config-manager --add-repo ${third_party_repo[*]}"
+      fi
     fi
 
     echo "RUN dnf install -y 'dnf-command(download)'" >> Dockerfile
 
     # source code
     if [ $get_source == 1 ]; then
-        get_source_command="dnf download --source ${packages[*]} --url | grep ^http:// | awk '{print \$1}' >> /var/cache/rpm/archives/urls.txt && dnf download --source ${packages[*]}"
+        get_source_command="dnf download --source ${packages[*]} --url | grep -E '^http://|^rsync://' | awk '{print \$1}' >> /var/cache/rpm/archives/urls.txt && dnf download --source ${packages[*]}"
     fi
 
 # prepare download script
@@ -306,7 +330,7 @@ mkdir -p /var/cache/rpm/archives
 cd /var/cache/rpm/archives
 $third_party_repo_command || true && \
 $get_source_command || true && \
-dnf download ${packages[*]} --url | grep ^http:// | awk '{print \$1}' >> /var/cache/rpm/archives/urls.txt &&
+dnf download ${packages[*]} --url | grep -E '^http://|^rsync://' | awk '{print \$1}' >> /var/cache/rpm/archives/urls.txt &&
 dnf download ${packages[*]}
 chown -R "$(id --user):$(id --group)" /var/cache/rpm/archives
 EOF

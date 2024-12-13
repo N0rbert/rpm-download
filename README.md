@@ -10,12 +10,12 @@ The `rpm-download.sh` takes at least three pairs of arguments, as shown in examp
 ./rpm-download.sh -d alt -r p8 -p mc
 ```
 
-* `-d` (distribution, mandatory) - `alt` for ALTLinux, `fedora` for Fedora, `mageia` for Mageia, `openmandriva` for OpenMandriva, `opensuse` for OpenSuSe, `rosa` for ROSA, `rockylinux` for Rocky Linux, `almalinux` for AlmaLinux, `oraclelinux` for Oracle Linux, `redos` for RedOS, `msvsphere` for MSVSphere;
-* `-r` (release, mandatory) - supported versions are the following: ALTLinux from `p8` to `sisyphus`, Fedora from `22` to `rawhide`, Mageia from `7` to `cauldron`, OpenMandriva - `4.2`, `cooker` and `rome`, OpenSuSe from `leap` to `tumbleweed`, Rosa - only `2021.1`, Rocky Linux from `8.4`, AlmaLinux from `8.4`, Oracle Linux from `8`, RedOS - only `latest`, MSVSphere from `8` to `latest`;
+* `-d` (distribution, mandatory) - `alt` for ALTLinux, `fedora` for Fedora, `mageia` for Mageia, `openmandriva` for OpenMandriva, `opensuse` for OpenSuSe, `rosa` for ROSA, `rockylinux` for Rocky Linux, `almalinux` for AlmaLinux, `oraclelinux` for Oracle Linux, `redos` for RedOS, `msvsphere` for MSVSphere, `centos` for CentOS;
+* `-r` (release, mandatory) - supported versions are the following: ALTLinux from `p8` to `sisyphus`, Fedora from `22` to `rawhide`, Mageia from `7` to `cauldron`, OpenMandriva - `4.2`, `cooker` and `rome`, OpenSuSe from `leap` to `tumbleweed`, Rosa - only `2021.1`, Rocky Linux from `8.4`, AlmaLinux from `8.4`, Oracle Linux from `8`, RedOS - only `latest`, MSVSphere from `8` to `latest`, CentOS from `stream9`;
 * `-p` (with quotes for multiple packages, mandatory) - represent package(s) name(s) - in the above example it is single `mc` package. For two packages use `"mc htop"` (for example);
 * `-s` (get source code of package(s), optional);
 * `-a` (enable Autoimports for ALTLinux, optional);
-* `-t` extra repository in three possible formats - `<URL of .repo-file>` or "`<URL> <LABEL>`" (Fedora, OpenSuSe, Mageia, Rocky Linux, AlmaLinux, RedOS), full rpm sources.list line (ALTLinux) (optional).
+* `-t` extra repository in three possible formats - `<URL of .repo-file>` or "`<URL> <LABEL>`" (Fedora, OpenSuSe, Mageia, Rocky Linux, AlmaLinux, RedOS), full rpm sources.list line (ALTLinux), `epel` (for CentOS) (optional).
 
 Note: if you have configured proxy in your network, then you can supply its address as the argument to the application - `http_proxy=http://192.168.12.34:8000 ./rpm-download.sh -d alt -r p8 -p mc` .
 

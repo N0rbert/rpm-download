@@ -13,6 +13,7 @@ http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d rockylinux -r 9.2 -p '
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d almalinux -r 9.2 -p 'bash' -s && tree storage
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d redos -r latest -p 'bash' -s && tree storage # src.rpm are not available
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d msvsphere -r latest -p bash -s && tree storage
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d centos -r stream9 -p mc -s && tree storage
 ```
 
 Third-party repository as .repo-URL - get only binary:
@@ -62,4 +63,10 @@ Third-party repository named Terra for Fedora - get only source:
 
 ```
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d fedora -r 39 -p terra-release -t "https://repos.fyralabs.com/terra39-source" -s && tree storage
+```
+
+Third-party repository named EPEL for CentOS Steam 9 with source:
+
+```
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d centos -r stream9 -p avrdude -s -t epel && tree storage
 ```
