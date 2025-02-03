@@ -8,11 +8,13 @@ where:
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)
+    -u  enable Autoports repository (optional for ALTLinux)
     -t  extra repository in three possible formats - <URL of .repo-file> or \"<URL> <LABEL>\" (Fedora, OpenSuSe, Mageia, Rocky Linux, AlmaLinux, Oracle Linux, RedOS), full rpm sources.list line (ALTLinux) (optional)"
 
 get_source=0
 use_autoimports=0
-while getopts ":hd:r:p:sat:" opt; do
+use_autoports=0
+while getopts ":hd:r:p:saut:" opt; do
   case "$opt" in
     h) echo "$usage"; exit;;
     d) distro=$OPTARG;;
@@ -20,6 +22,7 @@ while getopts ":hd:r:p:sat:" opt; do
     p) packages=$OPTARG;;
     s) get_source=1;;
     a) use_autoimports=1;;
+    u) use_autoports=1;;
     t) third_party_repo=$OPTARG;;
     \?) echo "Error: Unimplemented option chosen!"; echo "$usage" >&2; exit 1;;
   esac
@@ -231,6 +234,11 @@ EOF
             echo "RUN echo 'rpm http://mirror.yandex.ru/altlinux/autoimports/$release noarch autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
         fi
 
+        if [ $use_autoports == 1 ]; then
+            echo "RUN echo 'rpm http://autoports.altlinux.org/pub/ALTLinux/autoports/$release/  x86_64 autoports' >> /etc/apt/sources.list" >> Dockerfile
+            echo "RUN echo 'rpm http://autoports.altlinux.org/pub/ALTLinux/autoports/$release/  noarch autoports' >> /etc/apt/sources.list" >> Dockerfile
+        fi
+
         if [ $get_source == 1 ]; then
             echo "RUN echo 'rpm-src [$release] http://mirror.yandex.ru/altlinux $release/branch/x86_64 classic' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
             echo "RUN echo 'rpm-src [$release] http://mirror.yandex.ru/altlinux $release/branch/noarch classic' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
@@ -238,6 +246,10 @@ EOF
             if [ $use_autoimports == 1 ]; then
                 echo "RUN echo 'rpm-src http://mirror.yandex.ru/altlinux/autoimports/$release x86_64 autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
                 echo "RUN echo 'rpm-src http://mirror.yandex.ru/altlinux/autoimports/$release noarch autoimports' >> /etc/apt/sources.list.d/yandex.list" >> Dockerfile
+            fi
+
+            if [ $use_autoports == 1 ]; then
+                echo "RUN echo 'rpm-src http://autoports.altlinux.org/pub/ALTLinux/autoports/$release/  noarch autoports' >> /etc/apt/sources.list" >> Dockerfile
             fi
         fi
     else

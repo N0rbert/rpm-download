@@ -15,6 +15,7 @@ The `rpm-download.sh` takes at least three pairs of arguments, as shown in examp
 * `-p` (with quotes for multiple packages, mandatory) - represent package(s) name(s) - in the above example it is single `mc` package. For two packages use `"mc htop"` (for example);
 * `-s` (get source code of package(s), optional);
 * `-a` (enable Autoimports for ALTLinux, optional);
+* `-u` (enable Autoports for ALTLinux, optional);
 * `-t` extra repository in three possible formats - `<URL of .repo-file>` or "`<URL> <LABEL>`" (Fedora, OpenSuSe, Mageia, Rocky Linux, AlmaLinux, RedOS), full rpm sources.list line (ALTLinux), `epel` (for CentOS) (optional).
 
 Note: if you have configured proxy in your network, then you can supply its address as the argument to the application - `http_proxy=http://192.168.12.34:8000 ./rpm-download.sh -d alt -r p8 -p mc` .
