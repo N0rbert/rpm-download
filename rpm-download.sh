@@ -214,7 +214,7 @@ elif [ "$distro" == "almalinux" ]; then
 elif [ "$distro" == "oraclelinux" ]; then
     echo "FROM oraclelinux:$release" > Dockerfile
 elif [ "$distro" == "redos" ]; then
-    echo "FROM registry.red-soft.ru/ubi7:$release" > Dockerfile
+    echo "FROM registry.red-soft.ru/ubi7/ubi:$release" > Dockerfile
 elif [ "$distro" == "msvsphere" ]; then
     echo "FROM inferit/$distro:$release" > Dockerfile
 elif [ "$distro" == "centos" ]; then
