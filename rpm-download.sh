@@ -3,8 +3,8 @@ usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..
 Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
-    -d  distro name (alt, fedora, mageia, openmandriva, opensuse, rosa, rockylinux, almalinux, oraclelinux, redos, msvsphere)
-    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, 4.2 and cooker, leap and tumbleweed, only 2021.1, from 8.4, from 8.4, only latest, from 8.0)
+    -d  distro name (alt, fedora, mageia, openmandriva, opensuse, rosa, rockylinux, almalinux, oraclelinux, redos, msvsphere, centos)
+    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, 4.2 and cooker, leap and tumbleweed, only 2021.1, from 8.4, from 8.4, only latest, from 8.0, from stream9)
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)
