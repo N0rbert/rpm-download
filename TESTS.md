@@ -65,6 +65,12 @@ Third-party repository named Terra for Fedora - get only source:
 http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d fedora -r 39 -p terra-release -t "https://repos.fyralabs.com/terra39-source" -s && tree storage
 ```
 
+Third-party repository named COPR for Fedora - get binary and source:
+
+```
+http_proxy=http://192.168.3.222:8000 ./rpm-download.sh -d fedora -r 39 -p resources -t https://copr.fedorainfracloud.org/coprs/atim/resources/repo/fedora-39/atim-resources-fedora-39.repo -s && tree storage
+```
+
 Third-party repository named EPEL for CentOS Steam 9 with source:
 
 ```
