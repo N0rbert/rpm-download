@@ -56,7 +56,7 @@ opensuse_releases="15.3|15.4|15.5|15.6|leap|tumbleweed"
 rosa_releases="2021.1|2023.1"
 
 rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5"
-almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5"
+almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5|9.6"
 oraclelinux_releases="^8$|8.0|8.1|8.2|8.3|8.4|8.5|8.6|8.7|8.8|8.9|8.10|^9$"
 centos_releases="stream9|stream10"
 
@@ -327,7 +327,7 @@ EOF
       fi
     fi
 
-    echo "RUN dnf install -y 'dnf-command(download)' awk" >> Dockerfile
+    echo "RUN dnf install -y 'dnf-command(download)' awk || dnf install -y 'dnf-command(download)' gawk" >> Dockerfile
 
     # source code
     if [ $get_source == 1 ]; then
