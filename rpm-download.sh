@@ -53,7 +53,7 @@ fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|
 mageia_releases="7|8|9|cauldron";
 openmandriva_releases="4.2|cooker|rome"
 opensuse_releases="15.3|15.4|15.5|15.6|leap|tumbleweed"
-rosa_releases="2021.1|2023.1"
+rosa_releases="2021.1|2023.1|13"
 
 rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5"
 almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5|9.6|^10$"
