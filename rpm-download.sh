@@ -323,7 +323,12 @@ EOF
           echo "Warning: on CentOS currently only EPEL third-party repository is supported!"
         fi
       else
-        third_party_repo_command="dnf install -y 'dnf-command(config-manager)' && echo 'Please press <y> to accept GPG key!' && dnf config-manager --add-repo ${third_party_repo[*]}"
+        third_party_repo_command="dnf install -y 'dnf-command(config-manager)' && echo 'Please press <y> to accept GPG key!' && dnf config-manager -y --add-repo ${third_party_repo[*]}"
+        if [ "$distro" == "fedora" ]; then
+          if [[ "$release" -ge 41 || "$release" == "rawhide" ]]; then
+            third_party_repo_command="dnf install -y 'dnf-command(config-manager)' && echo 'Please press <y> to accept GPG key!' && dnf config-manager -y addrepo --from-repofile=${third_party_repo[*]}"
+          fi
+        fi
       fi
     fi
 
