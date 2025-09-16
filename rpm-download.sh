@@ -49,7 +49,7 @@ third_party_repo_command="true"
 
 # distros and their versions
 alt_releases="p8|p9|p10|p11|sisyphus";
-fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|rawhide";
+fedora_releases="22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|rawhide";
 mageia_releases="7|8|9|cauldron";
 openmandriva_releases="4.2|cooker|rome"
 opensuse_releases="15.3|15.4|15.5|15.6|leap|tumbleweed"
