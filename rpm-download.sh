@@ -4,7 +4,7 @@ Download rpm-package(s) for given distribution release,
 where:
     -h  show this help text
     -d  distro name (alt, fedora, mageia, openmandriva, opensuse, rosa, rockylinux, almalinux, oraclelinux, redos, msvsphere, centos)
-    -r  release name (p8/p9/p10/sisyphus, 22 to rawhide, 7 to cauldron, 4.2 and cooker, leap and tumbleweed, only 2021.1, from 8.4, from 8.4, only latest, from 8.0, from stream9)
+    -r  release name (from p8 to sisyphus, 22 to rawhide, 7 to cauldron, 4.2 and cooker, leap and tumbleweed, only 2021.1, from 8.4, from 8.4, only latest, from 8.0, from stream9)
     -p  packages
     -s  also download source-code package(s) (optional)
     -a  enable Autoimports repository (optional for ALTLinux)
@@ -56,7 +56,7 @@ opensuse_releases="15.3|15.4|15.5|15.6|leap|tumbleweed"
 rosa_releases="2021.1|2023.1|13"
 
 rockylinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5|9.6|^10$"
-almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5|9.6|^10$"
+almalinux_releases="8.4|8.5|8.6|8.7|8.8|8.9|8.10|9.0|9.1|9.2|9.3|9.4|9.5|9.6|9.7|^10$"
 oraclelinux_releases="^8$|8.0|8.1|8.2|8.3|8.4|8.5|8.6|8.7|8.8|8.9|8.10|^9$"
 centos_releases="stream9|stream10"
 
